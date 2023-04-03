@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "394920570046",
+    "project_id": "story-saver-7ebc6",
+    "storage_bucket": "story-saver-7ebc6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:394920570046:android:c663eba4966080245082ef",
+        "android_client_info": {
+          "package_name": "com.bumbumapps.statusdownloader"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "394920570046-kt5hvtbjnefo5qvujh9hmbh1dv3ie40k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOT1s5L49RFI8o68XlZFUpY5KetqLXP2I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "394920570046-kt5hvtbjnefo5qvujh9hmbh1dv3ie40k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
