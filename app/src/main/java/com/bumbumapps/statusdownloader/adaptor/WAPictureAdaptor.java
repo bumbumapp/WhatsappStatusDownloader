@@ -22,6 +22,7 @@ import com.bumbumapps.statusdownloader.utils.Observer;
 import com.bumbumapps.statusdownloader.R;
 import com.bumbumapps.statusdownloader.utils.Subject;
 import com.bumbumapps.statusdownloader.utils.Config;
+import com.bumbumapps.statusdownloader.utils.StatusStorage;
 import com.bumbumapps.statusdownloader.activity.ImageViewerActivity;
 
 import java.io.File;
@@ -68,69 +69,15 @@ public class WAPictureAdaptor extends RecyclerView.Adapter<WAPictureAdaptor.MyVi
     }
 
     public void copyFileOrDirectory(String srcDir, String dstDir) {
-
-        try {
-            File src = new File(srcDir);
-            File dst = new File(dstDir, src.getName());
-
-            if (src.isDirectory()) {
-
-                String files[] = src.list();
-                int filesLength = files.length;
-                for (int i = 0; i < filesLength; i++) {
-                    String src1 = (new File(src, files[i]).getPath());
-                    String dst1 = dst.getPath();
-                    copyFileOrDirectory(src1, dst1);
-
-                  //  Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,uri);
-                  //  mediaScanIntent.setData(Uri.fromFile(file));
-                  //  acontext.sendBroadcast(mediaScanIntent);
-
-                }
-            } else {
-               // Toast.makeText(acontext,dst,Toast.LENGTH_SHORT).show();
-                copyFile(src, dst);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        // Streams through ContentResolver/MediaStore (scoped storage); srcDir is a path or content Uri.
+        boolean ok = StatusStorage.save(acontext, srcDir, dstDir);
+        Toast.makeText(acontext, ok ? "Saved" : "Save failed", Toast.LENGTH_SHORT).show();
     }
 
-    public void copyFile(File sourceFile, File destFile) throws IOException {
-        if (!destFile.getParentFile().exists())
-            destFile.getParentFile().mkdirs();
 
-        if (!destFile.exists()) {
-            destFile.createNewFile();
-        }
-
-        FileChannel source = null;
-        FileChannel destination = null;
-
-        try {
-            source = new FileInputStream(sourceFile).getChannel();
-            destination = new FileOutputStream(destFile).getChannel();
-            destination.transferFrom(source, 0, source.size());
-           // Toast.makeText(acontext,dst1,Toast.LENGTH_SHORT).show();
-            Toast.makeText(acontext, "Picture Saved", Toast.LENGTH_SHORT).show();
-        } finally {
-            if (source != null) {
-                source.close();
-            }
-            if (destination != null) {
-                destination.close();
-            }
-        }
-    }
 
     public void shareVia(String type, String path) {
-        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-        sharingIntent.setType(type);
-        File fileToShare = new File(path);
-        Uri uri = Uri.fromFile(fileToShare);
-        sharingIntent.putExtra(Intent.EXTRA_STREAM, uri);
-        acontext.startActivity(Intent.createChooser(sharingIntent, "Share via"));
-
+        StatusStorage.share(acontext, path, type);
     }
 
     public void allSharedPreference(int i) {
@@ -216,8 +163,7 @@ public class WAPictureAdaptor extends RecyclerView.Adapter<WAPictureAdaptor.MyVi
 
                     }
                     copyFileOrDirectory(modelStatus.getFull_path(), path);
-                    Toast.makeText(acontext,modelStatus.getFull_path(),Toast.LENGTH_SHORT).show();
-                    sharePerAds();
+                                        sharePerAds();
 
                 }
             });
@@ -228,9 +174,9 @@ public class WAPictureAdaptor extends RecyclerView.Adapter<WAPictureAdaptor.MyVi
                 public void onClick(View v) {
                     ModelStatus modelStatus = arrayList.get(getAdapterPosition());
 
-                    if (modelStatus.getFull_path().endsWith(".jpg")) {
+                    if (StatusStorage.isImage(modelStatus.getFull_path())) {
                         shareVia("image/jpg", modelStatus.getFull_path());
-                    } else if (modelStatus.getFull_path().endsWith(".mp4")) {
+                    } else if (StatusStorage.isVideo(modelStatus.getFull_path())) {
                         shareVia("video/mp4", modelStatus.getFull_path());
                     }
 
@@ -245,9 +191,9 @@ public class WAPictureAdaptor extends RecyclerView.Adapter<WAPictureAdaptor.MyVi
                 public void onClick(View v) {
                     ModelStatus modelStatus = arrayList.get(getAdapterPosition());
 
-                    if (modelStatus.getFull_path().endsWith(".jpg")) {
+                    if (StatusStorage.isImage(modelStatus.getFull_path())) {
                         shareVia("image/jpg", modelStatus.getFull_path());
-                    } else if (modelStatus.getFull_path().endsWith(".mp4")) {
+                    } else if (StatusStorage.isVideo(modelStatus.getFull_path())) {
                         shareVia("video/mp4", modelStatus.getFull_path());
                     }
                     sharePerAds();
@@ -279,19 +225,12 @@ public class WAPictureAdaptor extends RecyclerView.Adapter<WAPictureAdaptor.MyVi
 
                     }
 
-                    if (modelStatus.getFull_path().endsWith(".jpg")) {
+                    if (StatusStorage.isImage(modelStatus.getFull_path())) {
                         copyFileOrDirectory(modelStatus.getFull_path(), path);
-                        String hello = path+modelStatus.getPath()+".jpg";
-                        File hello2 = new File(hello);
-
-                        acontext.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(hello2)));
                      //   Toast.makeText(acontext,hello,Toast.LENGTH_SHORT).show();
 
-                    } else if (modelStatus.getFull_path().endsWith(".mp4")) {
+                    } else if (StatusStorage.isVideo(modelStatus.getFull_path())) {
                         copyFileOrDirectory(modelStatus.getFull_path(), path);
-                        String hello = path+modelStatus.getPath()+".mp4";
-                        File hello2 = new File(hello);
-                        acontext.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(hello2)));
                        // Toast.makeText(acontext,hello,Toast.LENGTH_SHORT).show();
                     }
 

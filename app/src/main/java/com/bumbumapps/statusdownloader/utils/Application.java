@@ -34,6 +34,7 @@ public class Application extends android.app.Application {
 
         instance = this;
         initApp();
+        registerActivityLifecycleCallbacks(new com.bumbumapps.statusdownloader.EdgeToEdgeCallbacks());
     }
 
     private void initApp() {

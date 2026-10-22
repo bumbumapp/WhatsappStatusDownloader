@@ -21,6 +21,7 @@ import com.bumbumapps.statusdownloader.utils.Observer;
 import com.bumbumapps.statusdownloader.R;
 import com.bumbumapps.statusdownloader.utils.Subject;
 import com.bumbumapps.statusdownloader.utils.Config;
+import com.bumbumapps.statusdownloader.utils.StatusStorage;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -124,9 +125,9 @@ public class VIdeoViewerActivity extends AppCompatActivity implements Subject {
             @Override
             public void onClick(View v) {
 
-                if (videoPath.endsWith(".jpg")) {
+                if (StatusStorage.isImage(videoPath)) {
                     shareVia("image/jpg", videoPath);
-                } else if (videoPath.endsWith(".mp4")) {
+                } else if (StatusStorage.isVideo(videoPath)) {
                     shareVia("video/mp4", videoPath);
                 }
 
@@ -139,9 +140,9 @@ public class VIdeoViewerActivity extends AppCompatActivity implements Subject {
             @Override
             public void onClick(View v) {
 
-                if (videoPath.endsWith(".jpg")) {
+                if (StatusStorage.isImage(videoPath)) {
                     shareVia("image/jpg", videoPath);
-                } else if (videoPath.endsWith(".mp4")) {
+                } else if (StatusStorage.isVideo(videoPath)) {
                     shareVia("video/mp4", videoPath);
                 }
 
@@ -155,9 +156,9 @@ public class VIdeoViewerActivity extends AppCompatActivity implements Subject {
             @Override
             public void onClick(View v) {
 
-                if (videoPath.endsWith(".jpg")) {
+                if (StatusStorage.isImage(videoPath)) {
                     shareViaWhatsApp("image/jpg", videoPath, package_name);
-                } else if (videoPath.endsWith(".mp4")) {
+                } else if (StatusStorage.isVideo(videoPath)) {
                     shareViaWhatsApp("video/mp4", videoPath, package_name);
                 }
 
@@ -170,9 +171,9 @@ public class VIdeoViewerActivity extends AppCompatActivity implements Subject {
             @Override
             public void onClick(View v) {
 
-                if (videoPath.endsWith(".jpg")) {
+                if (StatusStorage.isImage(videoPath)) {
                     shareViaWhatsApp("image/jpg", videoPath, package_name);
-                } else if (videoPath.endsWith(".mp4")) {
+                } else if (StatusStorage.isVideo(videoPath)) {
                     shareViaWhatsApp("video/mp4", videoPath, package_name);
                 }
 
@@ -210,88 +211,29 @@ public class VIdeoViewerActivity extends AppCompatActivity implements Subject {
     }
 
     public void copyFileOrDirectory(String srcDir, String dstDir) {
-
-        try {
-            File src = new File(srcDir);
-            File dst = new File(dstDir, src.getName());
-
-            if (src.isDirectory()) {
-
-                String files[] = src.list();
-                int filesLength = files.length;
-                for (int i = 0; i < filesLength; i++) {
-                    String src1 = (new File(src, files[i]).getPath());
-                    String dst1 = dst.getPath();
-                    copyFileOrDirectory(src1, dst1);
-
-                }
-            } else {
-                copyFile(src, dst);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        // Streams through ContentResolver/MediaStore (scoped storage); srcDir is a path or content Uri.
+        boolean ok = StatusStorage.save(this, srcDir, dstDir);
+        Toast.makeText(this, ok ? "Saved" : "Save failed", Toast.LENGTH_SHORT).show();
     }
 
-    public void copyFile(File sourceFile, File destFile) throws IOException {
-        if (!destFile.getParentFile().exists())
-            destFile.getParentFile().mkdirs();
 
-        if (!destFile.exists()) {
-            destFile.createNewFile();
-        }
-
-        FileChannel source = null;
-        FileChannel destination = null;
-
-        try {
-            source = new FileInputStream(sourceFile).getChannel();
-            destination = new FileOutputStream(destFile).getChannel();
-            destination.transferFrom(source, 0, source.size());
-            Toast.makeText(getApplicationContext(), "Video Saved", Toast.LENGTH_SHORT).show();
-        } finally {
-            if (source != null) {
-                source.close();
-            }
-            if (destination != null) {
-                destination.close();
-            }
-        }
-    }
 
     public void shareVia(String type, String path) {
-        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-        sharingIntent.setType(type);
-        File fileToShare = new File(path);
-        Uri uri = Uri.fromFile(fileToShare);
-        sharingIntent.putExtra(Intent.EXTRA_STREAM, uri);
-        startActivity(Intent.createChooser(sharingIntent, "Share via"));
-
+        StatusStorage.share(this, path, type);
     }
 
 
     public void shareViaWhatsApp(String type, String path, String package_name) {
-
-/*
-        com.whatsapp.w4b
-        com.gbwhatsapp
-        com.whatsapp
-*/
-        PackageManager pm = getPackageManager();
         try {
-            PackageInfo info = pm.getPackageInfo(package_name, PackageManager.GET_META_DATA);
-
+            getPackageManager().getPackageInfo(package_name, 0);
             Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
             sharingIntent.setType(type);
-            File fileToShare = new File(path);
-            Uri uri = Uri.fromFile(fileToShare);
-            sharingIntent.putExtra(Intent.EXTRA_STREAM, uri);
-            sharingIntent.setPackage(package_name);//package name of the app
-            startActivity(Intent.createChooser(sharingIntent, "Share via"));
-
-        } catch (PackageManager.NameNotFoundException e) {
-            Toast.makeText(this, "WhatsApp not Installed", Toast.LENGTH_SHORT)
-                    .show();
+            sharingIntent.putExtra(Intent.EXTRA_STREAM, StatusStorage.shareUri(this, path));
+            sharingIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            sharingIntent.setPackage(package_name);
+            startActivity(sharingIntent);
+        } catch (PackageManager.NameNotFoundException | RuntimeException e) {
+            Toast.makeText(this, "WhatsApp not Installed", Toast.LENGTH_SHORT).show();
         }
     }
 

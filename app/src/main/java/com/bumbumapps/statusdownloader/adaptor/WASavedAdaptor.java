@@ -22,6 +22,7 @@ import com.bumbumapps.statusdownloader.utils.Observer;
 import com.bumbumapps.statusdownloader.R;
 import com.bumbumapps.statusdownloader.utils.Subject;
 import com.bumbumapps.statusdownloader.utils.Config;
+import com.bumbumapps.statusdownloader.utils.StatusStorage;
 import com.bumbumapps.statusdownloader.activity.ImageViewerActivity;
 import com.bumbumapps.statusdownloader.activity.VIdeoViewerActivity;
 
@@ -65,26 +66,18 @@ public class WASavedAdaptor extends RecyclerView.Adapter<WASavedAdaptor.MyViewHo
     }
 
     public void shareVia(String type, String path) {
-        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-        sharingIntent.setType(type);
-        File fileToShare = new File(path);
-        Uri uri = Uri.fromFile(fileToShare);
-        sharingIntent.putExtra(Intent.EXTRA_STREAM, uri);
-        acontext.startActivity(Intent.createChooser(sharingIntent, "Share via"));
-
+        StatusStorage.share(acontext, path, type);
     }
 
     public void deleteFile(String path, int position) {
-        File fdelete = new File(path);
-        if (fdelete.exists()) {
-            if (fdelete.delete()) {
-                removeAt(position);
-                Toast.makeText(acontext, "Delete Success", Toast.LENGTH_SHORT).show();
-                System.out.println("file Deleted :" + path);
-            } else {
-                Toast.makeText(acontext, "Delete Failed", Toast.LENGTH_SHORT).show();
-                System.out.println("file not Deleted :" + path);
-            }
+        if (position < 0 || position >= arrayList.size()) {
+            return;
+        }
+        if (StatusStorage.delete(acontext, path)) {
+            removeAt(position);
+            Toast.makeText(acontext, "Delete Success", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(acontext, "Delete Failed", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -176,9 +169,9 @@ public class WASavedAdaptor extends RecyclerView.Adapter<WASavedAdaptor.MyViewHo
                 public void onClick(View v) {
                     ModelStatus modelStatus = arrayList.get(getAdapterPosition());
 
-                    if (modelStatus.getFull_path().endsWith(".jpg")) {
+                    if (StatusStorage.isImage(modelStatus.getFull_path())) {
                         shareVia("image/jpg", modelStatus.getFull_path());
-                    } else if (modelStatus.getFull_path().endsWith(".mp4")) {
+                    } else if (StatusStorage.isVideo(modelStatus.getFull_path())) {
                         shareVia("video/mp4", modelStatus.getFull_path());
                     }
 
@@ -191,9 +184,9 @@ public class WASavedAdaptor extends RecyclerView.Adapter<WASavedAdaptor.MyViewHo
                 public void onClick(View v) {
                     ModelStatus modelStatus = arrayList.get(getAdapterPosition());
 
-                    if (modelStatus.getFull_path().endsWith(".jpg")) {
+                    if (StatusStorage.isImage(modelStatus.getFull_path())) {
                         shareVia("image/jpg", modelStatus.getFull_path());
-                    } else if (modelStatus.getFull_path().endsWith(".mp4")) {
+                    } else if (StatusStorage.isVideo(modelStatus.getFull_path())) {
                         shareVia("video/mp4", modelStatus.getFull_path());
                     }
 
@@ -220,7 +213,7 @@ public class WASavedAdaptor extends RecyclerView.Adapter<WASavedAdaptor.MyViewHo
                 @Override
                 public void onClick(View v) {
                     ModelStatus modelStatus = arrayList.get(getAdapterPosition());
-                    if (modelStatus.getFull_path().endsWith(".jpg")) {
+                    if (StatusStorage.isImage(modelStatus.getFull_path())) {
                         /*File file = new File(modelStatus.getFull_path());
                         Intent intent = new Intent(Intent.ACTION_VIEW);
                         intent.setDataAndType(Uri.fromFile(file), "image/*");

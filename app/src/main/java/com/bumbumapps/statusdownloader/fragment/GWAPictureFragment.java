@@ -19,6 +19,7 @@ import com.bumbumapps.statusdownloader.adaptor.WAPictureAdaptor;
 import com.bumbumapps.statusdownloader.model.ModelStatus;
 import com.bumbumapps.statusdownloader.R;
 import com.bumbumapps.statusdownloader.utils.Config;
+import com.bumbumapps.statusdownloader.utils.StatusListLoader;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -48,7 +49,7 @@ public class GWAPictureFragment extends Fragment implements SwipeRefreshLayout.O
         mSwipeRefreshLayout = view.findViewById(R.id.contentView);
         mSwipeRefreshLayout.setOnRefreshListener(this);
         textView = view.findViewById(R.id.textView);
-        rv.setHasFixedSize(true);
+        rv.setHasFixedSize(false); // wrap_content RecyclerView must re-measure
 
         loadData();
 
@@ -57,53 +58,18 @@ public class GWAPictureFragment extends Fragment implements SwipeRefreshLayout.O
     }
 
     public void loadData() {
-        data = new ArrayList<>();
-        final String path = Config.GBWhatsAppDirectoryPath;
-        File directory = new File(path);
-        if (directory.exists()) {
-            final File[] files = directory.listFiles();
-            Log.d("Files", "Size: " + files.length);
-            final String[] paths = {""};
-
-            new AsyncTask<Void, Void, Void>() {
-                @Override
-                protected Void doInBackground(Void... voids) {
-                    for (int i = 0; i < files.length; i++) {
-                        Log.d("Files", "FileName:" + files[i].getName());
-                        Log.d("Files", "FileName:" + files[i].getName().substring(0, files[i].getName().length() - 4));
-                        if (files[i].getName().endsWith(".jpg") || files[i].getName().endsWith("gif")) {
-                            paths[0] = path + "" + files[i].getName();
-                            ModelStatus modelStatus = new ModelStatus(paths[0], files[i].getName().substring(0, files[i].getName().length() - 4), 1);
-                            data.add(modelStatus);
-                        }
-                    }
-                    return null;
-                }
-
-                @Override
-                protected void onPostExecute(Void aVoid) {
-                    super.onPostExecute(aVoid);
-                    if (!(data.toArray().length > 0)) {
-                        textView.setVisibility(View.VISIBLE);
-                        textView.setText("No Status Available \n Check Out some Status & come back again...");
-                    }
-                    WAPictureAdaptor adapter = new WAPictureAdaptor(getActivity(), data);
-                    rv.setAdapter(adapter);
-
-                    LinearLayoutManager llm = new GridLayoutManager(getActivity(), 2);
-                    rv.setLayoutManager(llm);
-                }
-            }.execute();
-
-
-        } else {
-            textView.setVisibility(View.VISIBLE);
-            textView.setText("No Status Available \n Check Out some Status & come back again...");
-
-            Snackbar.make(getActivity().findViewById(android.R.id.content), "GWAActivity Not Installed",
-                    Snackbar.LENGTH_SHORT).show();
-        }
+        // Scoped storage: SAF folder grant on Android 11+, MediaStore for saved files (see StatusStorage).
+        StatusListLoader.load(this, Config.GBWhatsAppDirectoryPath, new String[]{".jpg", ".gif"}, 1, false, textView, rv,
+                list -> new WAPictureAdaptor(getActivity(), list));
         refreshItems();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, android.content.Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (StatusListLoader.onActivityResult(this, Config.GBWhatsAppDirectoryPath, requestCode, resultCode, data)) {
+            loadData();
+        }
     }
 
     @Override
