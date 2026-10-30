@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#221F35</color>
-    <color name="colorPrimaryDark">#221F35</color>
-    <color name="colorAccent">#009688</color>
+    <color name="colorPrimary">#0D0F16</color>
+    <color name="colorPrimaryDark">#0D0F16</color>
+    <color name="colorAccent">#14B8A6</color>
     <color name="colorBlack">#000000</color>
-    <color name="colorLightWhite">#B3F9F7F7</color>
+    <color name="colorLightWhite">#9AA1B2</color>
     <!--FF5B5756-->
 
     <!-- FF353130-->
+    <color name="ws_card">#181B25</color>
+    <color name="ws_tab">#272B38</color>
 </resources>

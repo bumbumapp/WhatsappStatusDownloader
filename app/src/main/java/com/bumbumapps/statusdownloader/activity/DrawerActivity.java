@@ -62,7 +62,7 @@ public class DrawerActivity extends AppCompatActivity
         setContentView(R.layout.activity_drawer);
 //        MobileAds.initialize(this, String.valueOf(R.string.admob_app_id));
         Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle("WhatsApp Status");
+        toolbar.setTitle(R.string.toolbar_title);
 
 
         whatsapbusiness=findViewById(R.id.bwhatsapp);

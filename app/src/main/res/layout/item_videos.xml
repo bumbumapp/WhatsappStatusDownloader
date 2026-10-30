@@ -7,11 +7,12 @@
         android:id="@+id/card_view_order_cancel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="2dp"
+        android:layout_marginLeft="5dp"
         android:layout_marginTop="5dp"
-        android:layout_marginRight="2dp"
-        card_view:cardCornerRadius="10dp"
-        card_view:elevation="5dp">
+        android:layout_marginRight="5dp"
+        card_view:cardCornerRadius="20dp"
+        card_view:cardBackgroundColor="@color/ws_card"
+        card_view:cardElevation="0dp">
 
 
         <RelativeLayout

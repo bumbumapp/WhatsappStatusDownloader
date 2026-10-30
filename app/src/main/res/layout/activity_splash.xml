@@ -131,14 +131,18 @@
             android:layout_centerHorizontal="true"
             android:text="Allow Access"
             android:textSize="18sp"
-            android:layout_marginRight="10dp"
-            android:layout_marginLeft="10dp"
-            android:background="@drawable/background"
-            android:backgroundTint="#FFC107"
+            android:layout_marginRight="16dp"
+            android:layout_marginLeft="16dp"
+            android:minHeight="56dp"
+            android:fontFamily="@font/jakarta_bold"
+            android:textAllCaps="false"
+            android:textColor="#04201D"
+            android:stateListAnimator="@null"
+            android:background="@drawable/ws_button"
             android:gravity="center"
             android:layout_marginBottom="20dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Inverse"
-            android:textColor="#FFFFFF" />
+            />
 
     </RelativeLayout>
 

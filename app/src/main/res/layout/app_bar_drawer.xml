@@ -16,7 +16,8 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" >
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+            app:titleTextAppearance="@style/WsTitle" >
 
             <ImageView
                 android:id="@+id/bwhatsapp"
@@ -33,14 +34,24 @@
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabs"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:layout_marginTop="0dp"
-            android:background="?attr/colorPrimary"
+            android:layout_height="44dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/ws_tabs_bg"
             android:fillViewport="false"
             app:popupTheme="@style/AppTheme.PopupOverlay"
+            app:tabBackground="@null"
             app:tabGravity="fill"
+            app:tabIndicator="@drawable/ws_tab_indicator"
+            app:tabIndicatorColor="@color/colorAccent"
+            app:tabIndicatorFullWidth="true"
+            app:tabIndicatorGravity="stretch"
             app:tabMode="fixed"
-            app:tabSelectedTextColor="@android:color/white"
+            app:tabRippleColor="@null"
+            app:tabSelectedTextColor="#04201D"
+            app:tabTextAppearance="@style/WsTabText"
             app:tabTextColor="@color/colorLightWhite" />
 
     </com.google.android.material.appbar.AppBarLayout>

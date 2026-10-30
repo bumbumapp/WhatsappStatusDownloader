@@ -20,4 +20,5 @@
     <string name="youAreNotUpdatedMessage">A new version of WhatsApp Status Downloader is available. Please update to version\s</string>
     <string name="youAreNotUpdatedMessage1">\s now</string>
     <string name="update">Update</string>
+    <string name="toolbar_title">Status Saver</string>
 </resources>
